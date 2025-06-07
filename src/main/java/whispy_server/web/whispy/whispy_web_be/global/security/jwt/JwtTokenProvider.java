@@ -1,12 +1,18 @@
 package whispy_server.web.whispy.whispy_web_be.global.security.jwt;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import whispy_server.web.whispy.whispy_web_be.domain.auth.domain.RefreshToken;
 import whispy_server.web.whispy.whispy_web_be.domain.auth.domain.repository.RefreshTokenRepository;
 import whispy_server.web.whispy.whispy_web_be.global.security.auth.AuthDetailsService;
+import whispy_server.web.whispy.whispy_web_be.global.security.jwt.exception.ExpiredJwtException;
+import whispy_server.web.whispy.whispy_web_be.global.security.jwt.exception.InvalidJwtException;
 
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Date;
@@ -60,5 +66,26 @@ public class JwtTokenProvider {
         String bearerToken = request.getHeader(jwtProperties.getHeader());
         return parseToken(bearerToken);
     }
+    public Claims getTokenBody(String token){
+        try{
+            return Jwts.parserBuilder()
+                    .setSigningKey(secretKeySpec)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (io.jsonwebtoken.ExpiredJwtException e){
+            throw ExpiredJwtException.EXCEPTION;
+        } catch (Exception e){
+            throw InvalidJwtException.EXCEPTION;
+        }
+    }
 
+    public String getTokenSubject(String token){
+        return getTokenBody(token).getSubject();
+    }
+
+    public Authentication getAuthentication(String token){
+        UserDetails userDetails = authDetailsService.loadUserByUsername(getTokenSubject(token));
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
 }
