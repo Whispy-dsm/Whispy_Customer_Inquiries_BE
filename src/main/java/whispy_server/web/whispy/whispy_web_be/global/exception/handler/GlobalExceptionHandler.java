@@ -19,19 +19,19 @@ public class GlobalExceptionHandler {
     private final ExceptionFacade exceptionFacade;
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> CustomExceptionHandling(CustomException e, Locale locale){
+    public ResponseEntity<ErrorResponse> customExceptionHandling(CustomException e, Locale locale){
         return ResponseEntity.status(e.getErrorCode().getStatus())
                 .body(exceptionFacade.resolveCustomException(e, locale));
     }
 
     @ExceptionHandler(BindException.class)
-    public ResponseEntity<ErrorResponse> BindExceptionHandling(BindException e, Locale locale){
+    public ResponseEntity<ErrorResponse> bindExceptionHandling(BindException e, Locale locale){
         return ResponseEntity.badRequest()
                 .body(exceptionFacade.resolveBindException(e, locale));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> ExceptionHandling(Exception e, Locale locale){
+    public ResponseEntity<ErrorResponse> exceptionHandling(Exception e, Locale locale){
         return ResponseEntity.internalServerError()
                 .body(exceptionFacade.resolveException(e, locale));
     }
