@@ -18,9 +18,9 @@ import java.time.ZonedDateTime;
 @Service
 @RequiredArgsConstructor
 public class ReissueService {
-    public final JwtTokenProvider jwtTokenProvider;
-    public final JwtProperties jwtProperties;
-    public final RefreshTokenRepository refreshTokenRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final JwtProperties jwtProperties;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Transactional
     public TokenResponse reissue(HttpServletRequest request){
