@@ -38,7 +38,4 @@ spring:
   messages:
     encoding: UTF-8
 
-app:
-  timezone: Asia/Seoul
-
 

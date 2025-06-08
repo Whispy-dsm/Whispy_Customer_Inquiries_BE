@@ -28,7 +28,7 @@ public class JwtTokenProvider {
         this.jwtProperties = jwtProperties;
         this.refreshTokenRepository = refreshTokenRepository;
         this.authDetailsService = authDetailsService;
-        this.secretKeySpec = new SecretKeySpec(jwtProperties.getSecretKey().getBytes(), SignatureAlgorithm.HS256.getJcaName());
+        this.secretKeySpec = new SecretKeySpec(jwtProperties.getSecretKey().getBytes(), SignatureAlgorithm.RS256.getJcaName());
     }
 
     public String generateToken(String email, String type, Long exp){

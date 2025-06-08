@@ -13,7 +13,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "tbl_admin")
+@Table(name = "tbl_user")
 @Builder
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
