@@ -2,6 +2,7 @@ package whispy_server.web.whispy.whispy_web_be.domain.auth.service;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import whispy_server.web.whispy.whispy_web_be.domain.auth.domain.RefreshToken;
@@ -22,25 +23,31 @@ public class ReissueService {
     private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
 
+    @Value("${app.timezone:Asia/Seoul}")
+    private String timezone;
+
     @Transactional
     public TokenResponse reissue(HttpServletRequest request){
         String refreshToken = request.getHeader("Authorization");
-        if(refreshToken == null) throw InvalidRefreshTokenException.EXCEPTION; // TODO: 헤더 누락 시 MissingAuthorizationHeaderException 으로 수정 예정
+        if(refreshToken == null) throw InvalidRefreshTokenException.EXCEPTION;
 
         String parseToken = jwtTokenProvider.parseToken(refreshToken);
-        if(parseToken == null) throw InvalidRefreshTokenException.EXCEPTION; // TODO: 형식 오류 시 MalformedAuthorizationHeaderException 으로 분리 예정
+        jwtTokenProvider.getTokenBody(parseToken); //서명 및 만료 확인 TODO: validateToken 메서드 추가 예정
 
         RefreshToken redisRefreshToken = refreshTokenRepository.findByRefreshToken(parseToken)
                 .orElseThrow(() -> RefreshTokenNotFoundException.EXCEPTION);
 
         String email = redisRefreshToken.getEmail();
-        refreshTokenRepository.delete(redisRefreshToken);
+        String newRefreshToken = jwtTokenProvider.generateRefreshToken(email);
+        redisRefreshToken.update(newRefreshToken, jwtProperties.getRefreshExp());
+        refreshTokenRepository.save(redisRefreshToken);
 
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
+
         return TokenResponse.builder()
                 .accessToken(jwtTokenProvider.generateAccessToken(email))
                 .accessExpiredAt(now.plusSeconds(jwtProperties.getAccessExp()))
-                .refreshToken(jwtTokenProvider.generateRefreshToken(email))
+                .refreshToken(newRefreshToken)
                 .refreshExpiredAt(now.plusSeconds(jwtProperties.getRefreshExp()))
                 .build();
     }
