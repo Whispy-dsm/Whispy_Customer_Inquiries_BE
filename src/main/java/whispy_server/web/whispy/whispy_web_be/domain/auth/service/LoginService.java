@@ -1,6 +1,7 @@
 package whispy_server.web.whispy.whispy_web_be.domain.auth.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,9 @@ public class LoginService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${app.timezone:Asia/Seoul}")
+    private String timezone;
+
     @Transactional(readOnly = true)
     public TokenResponse login(LoginRequestDto dto){
         Admin admin = adminRepository.findByEmail(dto.email())
@@ -31,7 +35,7 @@ public class LoginService {
 
         if(!passwordEncoder.matches(dto.password(), admin.getPassword())) throw PasswordMisMatchException.EXCEPTION;
 
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
         return TokenResponse.builder()
                 .accessToken(jwtTokenProvider.generateAccessToken(dto.email()))
                 .accessExpiredAt(now.plusSeconds(jwtProperties.getAccessExp()))
