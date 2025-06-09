@@ -39,16 +39,16 @@ public class ReissueService {
 
         String email = redisRefreshToken.getEmail();
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(email);
-        redisRefreshToken.update(newRefreshToken, jwtProperties.getRefreshExp());
+        redisRefreshToken.update(newRefreshToken, jwtProperties.refreshExp());
         refreshTokenRepository.save(redisRefreshToken);
 
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
 
         return TokenResponse.builder()
                 .accessToken(jwtTokenProvider.generateAccessToken(email))
-                .accessExpiredAt(now.plusSeconds(jwtProperties.getAccessExp()))
+                .accessExpiredAt(now.plusSeconds(jwtProperties.accessExp()))
                 .refreshToken(newRefreshToken)
-                .refreshExpiredAt(now.plusSeconds(jwtProperties.getRefreshExp()))
+                .refreshExpiredAt(now.plusSeconds(jwtProperties.refreshExp()))
                 .build();
     }
 }

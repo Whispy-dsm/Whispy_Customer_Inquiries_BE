@@ -28,7 +28,7 @@ public class JwtTokenProvider {
         this.jwtProperties = jwtProperties;
         this.refreshTokenRepository = refreshTokenRepository;
         this.authDetailsService = authDetailsService;
-        this.secretKeySpec = new SecretKeySpec(jwtProperties.getSecretKey().getBytes(), SignatureAlgorithm.HS256.getJcaName());
+        this.secretKeySpec = new SecretKeySpec(jwtProperties.secretKey().getBytes(), SignatureAlgorithm.HS256.getJcaName());
     }
 
     public String generateToken(String email, String type, Long exp){
@@ -42,28 +42,28 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(String email){
-        return generateToken(email, "access", jwtProperties.getAccessExp());
+        return generateToken(email, "access", jwtProperties.accessExp());
     }
 
     public String generateRefreshToken(String email){
-        String refreshToken = generateToken(email, "refresh", jwtProperties.getRefreshExp());
+        String refreshToken = generateToken(email, "refresh", jwtProperties.refreshExp());
         refreshTokenRepository.save(RefreshToken.builder()
                 .email(email)
                 .refreshToken(refreshToken)
-                .ttl(jwtProperties.getRefreshExp())
+                .ttl(jwtProperties.refreshExp())
                 .build());
         return refreshToken;
     }
 
     public String parseToken(String bearerToken){
-        if(bearerToken != null && bearerToken.startsWith(jwtProperties.getPrefix())){
-            return bearerToken.replace(jwtProperties.getPrefix(), "").trim();
+        if(bearerToken != null && bearerToken.startsWith(jwtProperties.prefix())){
+            return bearerToken.replace(jwtProperties.prefix(), "").trim();
         }
         return null;
     }
 
     public String resolveToken(HttpServletRequest request){
-        String bearerToken = request.getHeader(jwtProperties.getHeader());
+        String bearerToken = request.getHeader(jwtProperties.header());
         return parseToken(bearerToken);
     }
     public Claims getTokenBody(String token){

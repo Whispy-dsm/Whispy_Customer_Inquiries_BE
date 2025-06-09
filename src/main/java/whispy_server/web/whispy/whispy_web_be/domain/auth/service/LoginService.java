@@ -38,9 +38,9 @@ public class LoginService {
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
         return TokenResponse.builder()
                 .accessToken(jwtTokenProvider.generateAccessToken(dto.email()))
-                .accessExpiredAt(now.plusSeconds(jwtProperties.getAccessExp()))
+                .accessExpiredAt(now.plusSeconds(jwtProperties.accessExp()))
                 .refreshToken(jwtTokenProvider.generateRefreshToken(dto.email()))
-                .refreshExpiredAt(now.plusSeconds(jwtProperties.getRefreshExp()))
+                .refreshExpiredAt(now.plusSeconds(jwtProperties.refreshExp()))
                 .build();
     }
 }
