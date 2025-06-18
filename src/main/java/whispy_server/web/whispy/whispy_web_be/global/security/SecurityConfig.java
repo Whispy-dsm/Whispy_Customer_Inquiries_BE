@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/reissue").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/bug-report").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new GlobalExceptionFilter(objectMapper, exceptionFacade), JwtTokenFilter.class)
