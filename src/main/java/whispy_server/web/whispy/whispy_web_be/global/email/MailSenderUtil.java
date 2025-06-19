@@ -2,6 +2,7 @@ package whispy_server.web.whispy.whispy_web_be.global.email;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -20,9 +21,9 @@ public class MailSenderUtil {
             message.setSubject(subject);
             message.setText(content);
             mailSender.send(message);
-        } catch (EmailSendFailedException e){
+        } catch (MailException e){
             log.error("메일 전송 실패: to={}, subject={}, reason={}", to, subject, e.getMessage(), e);
-            throw e;
+            throw EmailSendFailedException.EXCEPTION;
         }
     }
 }
