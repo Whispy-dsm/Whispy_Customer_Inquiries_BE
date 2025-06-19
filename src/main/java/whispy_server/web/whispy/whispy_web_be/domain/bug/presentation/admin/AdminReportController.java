@@ -35,7 +35,7 @@ public class AdminReportController {
         return queryBugReportAdminService.getBugReport(id);
     }
 
-    @DeleteMapping("/{id}")
+    @PatchMapping("/{id}/answer-and-delete") //자원의 부분상태를 수정 후 삭제진행
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void answerAndDelete(
             @RequestBody @Valid BugReportAnswerRequestDto dto,
