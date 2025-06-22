@@ -19,8 +19,15 @@ public enum ErrorCode {
     INVALID_JWT(HttpStatus.UNAUTHORIZED, "error.invalid_jwt"),
     INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "error.invalid_refresh_token"),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, "error.refresh_token_not_found"),
+    VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "error.validation"),
 
-    VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "error.validation");
+    //bug-report
+    BUG_REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, "error.bug_report_not_found"),
+
+    //email
+    EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "error.email_send_failed"),
+
+    DISCORD_WEBHOOK_FAILED(HttpStatus.BAD_GATEWAY, "error.discord_webhook_failed");
 
     private final HttpStatus status;
     private final String messageKey;
