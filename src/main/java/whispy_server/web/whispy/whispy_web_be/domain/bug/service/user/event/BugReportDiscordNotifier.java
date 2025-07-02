@@ -2,6 +2,7 @@ package whispy_server.web.whispy.whispy_web_be.domain.bug.service.user.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
@@ -14,6 +15,7 @@ import whispy_server.web.whispy.whispy_web_be.global.webhook.discord.DiscordMess
 public class BugReportDiscordNotifier {
     private final DiscordMessageProvider discordMessageProvider;
 
+    @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void sendDiscordMessage(BugReportCreatedEvent event){
         var report = event.bugReport();
