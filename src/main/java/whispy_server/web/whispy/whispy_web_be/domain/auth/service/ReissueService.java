@@ -28,19 +28,17 @@ public class ReissueService {
 
     @Transactional
     public TokenResponse reissue(HttpServletRequest request){
-        String refreshToken = request.getHeader("Authorization");
-        if(refreshToken == null) throw InvalidRefreshTokenException.EXCEPTION;
 
-        String parseToken = jwtTokenProvider.parseToken(refreshToken);
-        jwtTokenProvider.getTokenBody(parseToken); //서명 및 만료 확인 TODO: validateToken 메서드 추가 예정
+        String parseToken = jwtTokenProvider.resolveToken(request);
+        if(parseToken == null) throw InvalidRefreshTokenException.EXCEPTION;
 
-        RefreshToken redisRefreshToken = refreshTokenRepository.findByRefreshToken(parseToken)
+        RefreshToken refreshToken = refreshTokenRepository.findByRefreshToken(parseToken)
                 .orElseThrow(() -> RefreshTokenNotFoundException.EXCEPTION);
 
-        String email = redisRefreshToken.getEmail();
+        String email = refreshToken.getEmail();
         String newRefreshToken = jwtTokenProvider.generateRefreshToken(email);
-        redisRefreshToken.update(newRefreshToken, jwtProperties.refreshExp());
-        refreshTokenRepository.save(redisRefreshToken);
+        refreshToken.update(newRefreshToken, jwtProperties.refreshExp());
+        refreshTokenRepository.save(refreshToken);
 
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timezone));
 
