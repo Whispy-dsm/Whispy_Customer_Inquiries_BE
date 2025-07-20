@@ -3,7 +3,9 @@ package whispy_server.web.whispy.whispy_web_be.global.security.jwt;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,26 +16,24 @@ import whispy_server.web.whispy.whispy_web_be.global.security.auth.AuthDetailsSe
 import whispy_server.web.whispy.whispy_web_be.global.security.jwt.exception.ExpiredJwtException;
 import whispy_server.web.whispy.whispy_web_be.global.security.jwt.exception.InvalidJwtException;
 
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class JwtTokenProvider {
     private final JwtProperties jwtProperties;
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthDetailsService authDetailsService;
-    private final SecretKeySpec secretKeySpec;
 
-    public JwtTokenProvider(JwtProperties jwtProperties, RefreshTokenRepository refreshTokenRepository, AuthDetailsService authDetailsService){
-        this.jwtProperties = jwtProperties;
-        this.refreshTokenRepository = refreshTokenRepository;
-        this.authDetailsService = authDetailsService;
-        this.secretKeySpec = new SecretKeySpec(jwtProperties.secretKey().getBytes(), SignatureAlgorithm.HS256.getJcaName());
+    private SecretKey getSecretKey(){
+        return Keys.hmacShaKeyFor(jwtProperties.secretKey().getBytes(StandardCharsets.UTF_8));
     }
 
     public String generateToken(String email, String type, Long exp){
         return Jwts.builder()
-                .signWith(secretKeySpec)
+                .signWith(getSecretKey(), SignatureAlgorithm.HS256)
                 .setSubject(email)
                 .setHeaderParam("type", type)
                 .setIssuedAt(new Date())
@@ -69,7 +69,7 @@ public class JwtTokenProvider {
     public Claims getTokenBody(String token){
         try{
             return Jwts.parserBuilder()
-                    .setSigningKey(secretKeySpec)
+                    .setSigningKey(getSecretKey())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
