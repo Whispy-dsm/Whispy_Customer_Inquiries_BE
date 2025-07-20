@@ -35,10 +35,22 @@ public class SecurityConfig {
                 .cors(CorsConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(HttpMethod.POST, "/auth/login", "/auth/reissue").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/bug-report").permitAll()
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(authorizeRequests -> {
+                    //admin-auth
+                    authorizeRequests
+                            .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                            .requestMatchers(HttpMethod.POST, "/auth/reissue").authenticated();
+
+                    //user-bug-report
+                    authorizeRequests
+                            .requestMatchers(HttpMethod.POST, "/bug-report").permitAll();
+
+                    //admin-bug-reports
+                    authorizeRequests
+                            .requestMatchers(HttpMethod.GET, "/admin/bug-reports").authenticated()
+                            .requestMatchers(HttpMethod.GET, "/admin/bug-reports/{id}").authenticated()
+                            .requestMatchers(HttpMethod.PATCH, "/admin/bug-reports/{id}").authenticated();
+                })
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new GlobalExceptionFilter(objectMapper, exceptionFacade), JwtTokenFilter.class)
                 .build();
