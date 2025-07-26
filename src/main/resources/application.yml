@@ -58,4 +58,6 @@ discord:
   name: discord-feign-client
   webhook-url: ${discord.webhook-url}
 
-
+logging:
+  level:
+    org.springframework.security: DEBUG

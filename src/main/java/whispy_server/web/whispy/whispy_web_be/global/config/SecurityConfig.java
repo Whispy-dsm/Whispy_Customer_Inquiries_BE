@@ -1,4 +1,4 @@
-package whispy_server.web.whispy.whispy_web_be.global.security;
+package whispy_server.web.whispy.whispy_web_be.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
