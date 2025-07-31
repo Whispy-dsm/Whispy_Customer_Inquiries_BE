@@ -38,8 +38,4 @@ public class ChatRoom {
         this.createdAt = LocalDateTime.now();
         this.lastMessageAt = LocalDateTime.now();
     }
-
-    private void UpdateLastMessageTime(){
-        this.lastMessageAt = LocalDateTime.now();
-    }
 }
