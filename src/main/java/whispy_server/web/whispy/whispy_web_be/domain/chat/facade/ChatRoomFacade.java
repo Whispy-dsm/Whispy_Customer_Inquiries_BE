@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import whispy_server.web.whispy.whispy_web_be.domain.chat.domain.ChatRoom;
 import whispy_server.web.whispy.whispy_web_be.domain.chat.domain.repository.ChatRoomRepository;
+import whispy_server.web.whispy.whispy_web_be.domain.chat.exception.ChatRoomNotFoundException;
 
 @Component
 @RequiredArgsConstructor
@@ -23,6 +24,6 @@ public class ChatRoomFacade {
 
     public ChatRoom adminGetChatRoom(String sessionId){
         return chatRoomRepository.findBySessionId(sessionId)
-                .orElseThrow(RuntimeException::new); //TODO : 예외처리 추가
+                .orElseThrow(() -> ChatRoomNotFoundException.EXCEPTION); //TODO : 예외처리 추가
     }
 }
