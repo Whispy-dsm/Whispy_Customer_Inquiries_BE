@@ -32,7 +32,6 @@ public class AdminSendService {
         ChatMessage chatMessage = ChatMessage.builder()
                 .sender(Sender.ADMIN)
                 .content(dto.content())
-                .sentAt(LocalDateTime.now())
                 .build();
 
         chatMessageRepository.save(chatMessage);
