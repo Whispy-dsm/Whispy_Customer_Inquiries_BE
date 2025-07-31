@@ -1,4 +1,4 @@
-package whispy_server.web.whispy.whispy_web_be.global.security;
+package whispy_server.web.whispy.whispy_web_be.global.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -8,13 +8,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 import whispy_server.web.whispy.whispy_web_be.global.exception.facade.ExceptionFacade;
 import whispy_server.web.whispy.whispy_web_be.global.exception.handler.GlobalExceptionFilter;
 import whispy_server.web.whispy.whispy_web_be.global.security.jwt.JwtTokenFilter;
@@ -29,10 +29,12 @@ public class SecurityConfig {
     private final ExceptionFacade exceptionFacade;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource) throws Exception{
         return http
                 .csrf(CsrfConfigurer::disable)
-                .cors(CorsConfigurer::disable)
+                .cors(cors ->
+                    cors.configurationSource(corsConfigurationSource)
+                )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequests -> {
@@ -50,6 +52,11 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.GET, "/admin/bug-reports").authenticated()
                             .requestMatchers(HttpMethod.GET, "/admin/bug-reports/{id}").authenticated()
                             .requestMatchers(HttpMethod.PATCH, "/admin/bug-reports/{id}").authenticated();
+
+                    //chat-system
+                    authorizeRequests
+                            .requestMatchers(HttpMethod.GET, "/chat").authenticated()
+                            .requestMatchers(HttpMethod.GET, "/ws/**").permitAll();
                 })
                 .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new GlobalExceptionFilter(objectMapper, exceptionFacade), JwtTokenFilter.class)

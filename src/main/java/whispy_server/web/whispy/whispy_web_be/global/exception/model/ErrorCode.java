@@ -27,7 +27,10 @@ public enum ErrorCode {
     //email
     EMAIL_SEND_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "error.email_send_failed"),
 
-    DISCORD_WEBHOOK_FAILED(HttpStatus.BAD_GATEWAY, "error.discord_webhook_failed");
+    DISCORD_WEBHOOK_FAILED(HttpStatus.BAD_GATEWAY, "error.discord_webhook_failed"),
+
+    //CHAT
+    CHAT_ROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "error.chat_room_not_found");
 
     private final HttpStatus status;
     private final String messageKey;
