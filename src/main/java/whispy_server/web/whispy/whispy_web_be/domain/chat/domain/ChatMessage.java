@@ -32,4 +32,10 @@ public class ChatMessage {
     private ChatRoom chatRoom;
 
     private LocalDateTime sentAt;
+
+    @PrePersist
+    private void prePersist(){
+        this.sentAt = LocalDateTime.now();
+    }
+
 }

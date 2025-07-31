@@ -29,7 +29,6 @@ public class UserSendService {
         ChatMessage chatMessage = ChatMessage.builder()
                 .sender(Sender.USER)
                 .content(dto.content())
-                .sentAt(LocalDateTime.now())
                 .build();
 
         chatMessageRepository.save(chatMessage);
