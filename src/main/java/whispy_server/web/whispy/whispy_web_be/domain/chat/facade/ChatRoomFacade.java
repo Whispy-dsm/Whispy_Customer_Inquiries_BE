@@ -12,9 +12,13 @@ public class ChatRoomFacade {
 
     public ChatRoom userGetOrCreateChatRoom(String sessionId){
         return chatRoomRepository.findBySessionId(sessionId)
-                .orElseGet(() -> ChatRoom.builder()
-                        .sessionId(sessionId)
-                        .build());
+                .orElseGet(() -> {
+                    ChatRoom chatRoom = ChatRoom.builder()
+                            .sessionId(sessionId)
+                            .build();
+                    chatRoomRepository.save(chatRoom);
+                    return chatRoom;
+                });
     }
 
     public ChatRoom adminGetChatRoom(String sessionId){
